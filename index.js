@@ -7,22 +7,41 @@ import Kuroshiro from "kuroshiro";
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
 import { romanjiAlphabet, getTranslationUrl } from "./utils.js"
 
-const enToJap = async(en) =>
-    await fetch(`https://${getTranslationUrl()}/translate`, {
-        method: "POST",
-        body: JSON.stringify({
-            q: en,
-            source: "en",
-            target: "ja",
-            format: "text"
-        }),
-        headers: { "Content-Type": "application/json" }
-    }).then(res => res.json());
+const enToJap = async(en) => {
+    const baseUrl = getTranslationUrl()
+    console.log(baseUrl)
+    try {
+        const jap = await fetch(`https://${baseUrl}/translate`, {
+                method: "POST",
+                body: JSON.stringify({
+                    q: en,
+                    source: "en",
+                    target: "ja",
+                    format: "text"
+                }),
+                headers: { "Content-Type": "application/json" }
+            }).then(res => {
+                return res.json()
+            })
+            .then(data => {
+                console.log('got the translation!')
+                console.log(data);
+                return data;
+            })
+        return jap;
+
+    } catch (err) {
+        console.log(err)
+        throw new Error("Error fetching translation")
+    }
+}
 
 
 const japToRomanji = async(jap) => {
     const kuroshiro = new Kuroshiro.default();
+    console.log(kuroshiro)
     await kuroshiro.init(new KuromojiAnalyzer());
+    console.log('after initialization: ', kuroshiro)
     return await kuroshiro.convert(jap, { to: "romaji", mode: "spaced" });
 }
 
@@ -32,22 +51,22 @@ const romanjiToArray = (romanji) => {
         .replace(/ッ/g, "-")
         .replace(/,/g, "-")
         .replace(/\s/g, "--")
-        .replace(/shi/g, "si")
+        .replace(/\!/g, "--")
+        .replace(/\./g, "--")
+        .replace(/\?/g, "--")
         .replace(/\'/g, "")
-        .replace(/tte/g, "te")
+        .replace(/ū/g, "u")
 
 
     var returnArr = [];
     // Loop through the whole romanji
     var k = 0;
-    while (k < romanjiWithEmptyCharacters.length) {
-        for (var i = 3; i > 0; i--) {
-            var currSub = romanjiWithEmptyCharacters.substring(k, i + k);
-            if (romanjiAlphabet.indexOf(currSub) > -1) {
-                returnArr.push(currSub);
-                k += i;
-                i = 4;
-            }
+    for (var i = 3; i > 0; i--) {
+        var currSub = romanjiWithEmptyCharacters.substring(k, i + k);
+        if (romanjiAlphabet.indexOf(currSub) > -1) {
+            returnArr.push(currSub);
+            k += i;
+            i = 4;
         }
     }
 
@@ -64,9 +83,10 @@ const translate = async(req, res) => {
     try {
         const { translatedText: japanese } = await enToJap(input);
         const romanji = await japToRomanji(japanese)
+        console.log(romanji);
         const romanjiArray = romanjiToArray(romanji);
         if (!romanjiArray.length) {
-            throw new Error("No proper translation found.");
+            throw new Error("No proper translation found. Japanese: " + japanese + " Romanji: " + romanji);
         }
         return res.status(200).json({
             input: input,
