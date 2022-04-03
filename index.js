@@ -5,10 +5,10 @@ import cors from "cors";
 
 import Kuroshiro from "kuroshiro";
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
-import { romanjiAlphabet } from "./utils.js"
+import { romanjiAlphabet, getTranslationUrl } from "./utils.js"
 
 const enToJap = async(en) =>
-    await fetch("https://libretranslate.de/translate", {
+    await fetch(`https://${getTranslationUrl()}/translate`, {
         method: "POST",
         body: JSON.stringify({
             q: en,
