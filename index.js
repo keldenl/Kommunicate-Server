@@ -27,13 +27,14 @@ const enToJap = async(en) => {
                 return res.json()
             })
             .then(data => {
+                console.log(data);
                 return data;
             })
         return jap;
 
     } catch (err) {
         console.log(err)
-        throw new Error("Error fetching translation")
+        return new Error("Error translating: ", err)
     }
 }
 
@@ -56,6 +57,7 @@ const romanjiToArray = (romanji) => {
         .replace(/\'/g, "")
         .replace(/ū/g, "u")
         .replace(/ō/g, "o")
+        .replace(/ē/g, "e")
 
 
     var returnArr = [];
@@ -65,6 +67,7 @@ const romanjiToArray = (romanji) => {
         var currSub = romanjiWithEmptyCharacters.substring(k, i + k);
         if (romanjiAlphabet.indexOf(currSub) > -1) {
             returnArr.push(currSub);
+            console.log(currSub);
             k += i;
             i = 4;
         }
@@ -82,11 +85,15 @@ const translate = async(req, res) => {
     }
     try {
         const { translatedText: japanese } = await enToJap(input);
+
+        if (!japanese) {
+            throw new Error("Rate limit exceeded, try again in 10 seconds");
+        }
         const romanji = await japToRomanji(japanese)
         console.log(romanji);
         const romanjiArray = romanjiToArray(romanji);
         if (!romanjiArray.length) {
-            throw new Error("No proper translation found. Japanese: " + japanese + " Romanji: " + romanji);
+            throw new Error("No proper translation found for" + input + ". Japanese: " + japanese + " Romanji: " + romanji);
         }
         return res.status(200).json({
             input: input,
