@@ -1,31 +1,32 @@
 {
-  "name": "kommunicate-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/keldenl/Kommunicate-Server.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/keldenl/Kommunicate-Server/issues"
-  },
-  "homepage": "https://github.com/keldenl/Kommunicate-Server#readme",
-  "dependencies": {
-    "body-parser": "^1.20.0",
-    "cors": "^2.8.5",
-    "express": "^4.17.2",
-    "kuroshiro": "^1.2.0",
-    "kuroshiro-analyzer-kuromoji": "^1.1.0",
-    "node-fetch": "^3.2.3",
-    "nodemon": "^2.0.15"
-  }
+    "name": "kommunicate-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/keldenl/Kommunicate-Server.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/keldenl/Kommunicate-Server/issues"
+    },
+    "homepage": "https://github.com/keldenl/Kommunicate-Server#readme",
+    "dependencies": {
+        "body-parser": "^1.20.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.0",
+        "express": "^4.17.2",
+        "kuroshiro": "^1.2.0",
+        "kuroshiro-analyzer-kuromoji": "^1.1.0",
+        "node-fetch": "^3.2.3",
+        "nodemon": "^2.0.15"
+    }
 }

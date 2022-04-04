@@ -2,10 +2,13 @@ import express from "express";
 import fetch from "node-fetch";
 import bodyParser from "body-parser";
 import cors from "cors";
+import dotenv from "dotenv";
 
 import Kuroshiro from "kuroshiro";
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
 import { romanjiAlphabet, getTranslationUrl } from "./utils.js"
+
+dotenv.config();
 
 const enToJap = async(en) => {
     const baseUrl = getTranslationUrl()
