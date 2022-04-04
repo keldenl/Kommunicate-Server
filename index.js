@@ -9,9 +9,12 @@ import { romanjiAlphabet, getTranslationUrl } from "./utils.js"
 
 const enToJap = async(en) => {
     const baseUrl = getTranslationUrl()
-    console.log(baseUrl)
     try {
+        const ip = await fetch(`https://www.proxyscan.io/api/proxy?country=us&format=txt`).then(res => res.text());
+        const [host, port] = ip.split(":");
         const jap = await fetch(`https://${baseUrl}/translate`, {
+                host,
+                port,
                 method: "POST",
                 body: JSON.stringify({
                     q: en,
@@ -24,8 +27,6 @@ const enToJap = async(en) => {
                 return res.json()
             })
             .then(data => {
-                console.log('got the translation!')
-                console.log(data);
                 return data;
             })
         return jap;
@@ -39,10 +40,8 @@ const enToJap = async(en) => {
 
 const japToRomanji = async(jap) => {
     const kuroshiro = new Kuroshiro.default();
-    console.log(kuroshiro)
     await kuroshiro.init(new KuromojiAnalyzer());
-    console.log('after initialization: ', kuroshiro)
-    return await kuroshiro.convert(jap, { to: "romaji", mode: "spaced" });
+    return await kuroshiro.convert(jap, { to: "romaji", mode: "spaced", romanjiSystem: "passport" });
 }
 
 const romanjiToArray = (romanji) => {
@@ -56,6 +55,7 @@ const romanjiToArray = (romanji) => {
         .replace(/\?/g, "--")
         .replace(/\'/g, "")
         .replace(/ū/g, "u")
+        .replace(/ō/g, "o")
 
 
     var returnArr = [];
