@@ -49,8 +49,8 @@ const japToRomanji = async(jap) => {
 const romanjiToArray = (romanji) => {
     var romanjiWithEmptyCharacters = romanji
         .replace(/-/g, "")
-        .replace(/ッ/g, "-")
-        .replace(/,/g, "-")
+        .replace(/ッ/g, "--")
+        .replace(/,/g, "--")
         .replace(/\s/g, "--")
         .replace(/\!/g, "--")
         .replace(/\./g, "--")
