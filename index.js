@@ -6,15 +6,14 @@ import dotenv from "dotenv";
 
 import Kuroshiro from "kuroshiro";
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
-import { romanjiAlphabet, getTranslationUrl } from "./utils.js"
+import { romanjiAlphabet, getTranslationUrl, getIpFromProxyUrl } from "./utils.js"
 
 dotenv.config();
 
 const enToJap = async(en) => {
     const baseUrl = getTranslationUrl()
     try {
-        const ip = await fetch(`https://www.proxyscan.io/api/proxy?country=us&format=txt`).then(res => res.text());
-        const [host, port] = ip.split(":");
+        const { host, port } = await getIpFromProxyUrl();
         const jap = await fetch(`https://${baseUrl}/translate`, {
                 host,
                 port,
@@ -34,7 +33,6 @@ const enToJap = async(en) => {
                 return data;
             })
         return jap;
-
     } catch (err) {
         console.log(err)
         return new Error("Error translating: ", err)
@@ -70,9 +68,18 @@ const romanjiToArray = (romanji) => {
         var currSub = romanjiWithEmptyCharacters.substring(k, i + k);
         if (romanjiAlphabet.indexOf(currSub) > -1) {
             returnArr.push(currSub);
-            console.log(currSub);
             k += i;
             i = 4;
+        }
+        // don't cancel the rest of the translation, rather, just skip to the next word
+        else if (currSub.length === 1) {
+            const leftoverString = romanjiWithEmptyCharacters.substring(k, romanjiWithEmptyCharacters.length);
+            const nextWord = leftoverString.indexOf("--");
+            if (nextWord > -1) {
+                returnArr.push('--'); // additional "empty" space for where the next (invalid) word is
+                k += nextWord;
+                i = 4;
+            }
         }
     }
 
@@ -93,7 +100,6 @@ const translate = async(req, res) => {
             throw new Error("Rate limit exceeded, try again in 10 seconds");
         }
         const romanji = await japToRomanji(japanese)
-        console.log(romanji);
         const romanjiArray = romanjiToArray(romanji);
         if (!romanjiArray.length) {
             throw new Error("No proper translation found for" + input + ". Japanese: " + japanese + " Romanji: " + romanji);
